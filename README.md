@@ -258,3 +258,125 @@ await Database.transaction(async (trx) => {
 ```
 
 # Migrations
+
+AdnoisJs cũng hỗ trợ tạo các table cho ứng dụng của chúng ta bằng migration
+
+## Creating Migrations
+
+Để tạo một migrations mới , chúng ta gọi lệnh;
+
+```
+adonis make:migration users
+```
+
+Sau khi chạy lệnh trên, sẽ sinh ra một file mới trong folder _database/migrations_ với nội dung sau
+
+```
+'use strict'
+
+const Schema = use('Schema')
+
+class UsersSchema extends Schema {
+  up () {
+    this.create('users', (table) => {
+      table.increments()
+      table.timestamps()
+    })
+  }
+
+  down () {
+    this.drop('users')
+  }
+}
+
+module.exports = UsersSchema
+```
+ Trong file này sẽ bao gồm 2 function như các bạn có thể thấy đó là up() và down()
+ 
+ - up(): giúp thực hiện các hành động trên một table, bạn có thể  định nghĩa các trường của bảng, khóa chính, ...
+ - down(): giúp chúng ta revert những thay đổi trong table được định nghĩa trong hàm up()
+ 
+ Dưới đây là các command line của migrate
+ 
+ ```
+ | Command   |      Description      |
+|----------|:-------------|
+| make:migration | Tạo mới môt migrate file |
+| migration:run |    Chạy tất cả nhưng migrations đang pending   |
+| migration:rollback | Rollback lại migrations được set cuối cùng. |
+| migration:refresh | Rollback all migrations to the 0 batch then re-run them from the start. |
+| migration:reset | Rollback all migrations to the 0 batch. |
+| migration:status | Get the status of all the migrations. |
+ ```
+ 
+ ## Seeds & Factories
+ 
+ Tạo một seeds mới bằng lệnh:
+ 
+ ```
+ adonis make:seed User
+ ```
+ 
+ Hãy mở file vừa được tạo lên và thêm đoạn code
+ 
+ ```
+ const Factory = use('Factory')
+const Database = use('Database')
+
+class UserSeeder {
+  async run () {
+    const users = await Database.table('users')
+    console.log(users)
+  }
+}
+
+module.exports = UserSeeder
+ ```
+ 
+ Chạy file seed bằng lệnh _adonis seed_
+ 
+ ##  Factories
+ 
+ 
+```
+const Factory = use('Factory')
+const Hash = use('Hash')
+
+Factory.blueprint('App/Models/User', async (faker) => {
+  return {
+    username: faker.username(),
+    email: faker.email(),
+    password: await Hash.make(faker.password())
+  }
+})
+```
+
+xử dụng Factories như sau:
+
+```
+const user = await Factory
+  .model('App/Models/User')
+  .create()
+```
+
+## Creating Relationships
+
+```
+// User blueprint
+Factory.blueprint('App/Models/User', (faker) => {
+  return {
+    username: faker.username(),
+    password: faker.password()
+  }
+})
+
+// Post blueprint
+Factory.blueprint('App/Models/Post', (faker) => {
+  return {
+    title: faker.sentence(),
+    body: faker.paragraph()
+  }
+})
+```
+
+Trên đây mới chỉ là những ý chính trong phần Database của **AdonisJs** các bạn h
