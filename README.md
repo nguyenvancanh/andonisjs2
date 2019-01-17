@@ -379,4 +379,6 @@ Factory.blueprint('App/Models/Post', (faker) => {
 })
 ```
 
-Trên đây mới chỉ là những ý chính trong phần Database của **AdonisJs** các bạn h
+Trên đây mới chỉ là những ý chính trong phần Database của **AdonisJs** các bạn hãy bớt chút thời gian vào doc của nó để nghiên cứu thêm nhé. ^^
+
+
