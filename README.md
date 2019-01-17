@@ -165,3 +165,96 @@ await Database.select('username as uname')
 
 ## Where Clauses
 
+Trong những bài toán thực tế, việc truy vấn tới database không chỉ dừng lại ở việc select trường ra rồi dừng lại. mà để đáp ứng được hết các yêu cầu của bài toán, chúng ta cần kết hợp nhiều điều kiện thì mới có được kết quả như mong muốn. Trong trường hợp đó, chúng ta có method where() để giải quyết vấn đề.
+
+```
+const users = await Database.from('users').where('id', 1)
+// Or
+const users = await Database.from('users').where({ id: 1 })
+```
+
+Chúng ta cũng có thể truyền biểu thức so sánh vào trong mệnh đề where như sau:
+
+```
+const adults = await Database
+  .from('users')
+  .where('age', '>', 18)
+```
+
+Tất nhiên, khi có method where() thì chắc chắn chúng ta cũng có method phủ định của where, đó là whereNot, hay whereIn, rồi whereNotIn, ... 
+
+```
+await Database
+  .from('users')
+  .whereNot('age', '>', 15)
+
+// or
+await Database
+  .from('users')
+  .whereNot({username: 'foo'})
+  
+await Database
+  .from('users')
+  .whereIn('id', [1,2,3])
+  
+await Database
+  .from('users')
+  .whereNotIn('id', [1,2,3])
+```
+
+## Join
+
+Tất nhiên, trong một ứng dụng web, việc dữ liệu liên kết qua lại giữa các tables với nhau là chuyện hết sức bình thường, để liên kết các bảng với nhua thì chúng ta xử dụng phương thức join()
+
+## innerJoin
+
+```
+await Database
+  .table('users')
+  .innerJoin('accounts', function () {
+    this
+      .on('users.id', 'accounts.user_id')
+      .orOn('users.id', 'accounts.owner_id')
+  })
+```
+
+## leftJoin
+
+```
+Database
+  .select('*')
+  .from('users')
+  .leftJoin('accounts', 'users.id', 'accounts.user_id')
+```
+
+## leftOuterJoin
+
+```
+await Database
+  .select('*')
+  .from('users')
+  .leftOuterJoin('accounts', 'users.id', 'accounts.user_id')
+```
+Ngoài ra, các tính năng như insert, update, delete cũng đều được hỗ trợ đầy đủ. Các bạn có thể tìm hiểu thêm trong document của AdonisJs
+
+## Database Transactions
+
+- beginTransaction:
+
+```
+const trx = await Database.beginTransaction()
+await trx.insert({username: 'virk'}).into('users')
+
+await trx.commit() // insert query will take place on commit
+await trx.rollback() // will not insert anything
+```
+
+- transaction:
+
+```
+await Database.transaction(async (trx) => {
+  await trx.insert({username: 'virk'}).into('users')
+})
+```
+
+# Migrations
